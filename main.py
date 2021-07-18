@@ -67,19 +67,29 @@ while True:
                         else:
                             content = "unknown content type"
 
-                # push message to Gotify
+                # push message to push provider
                 title = "{0}{1}".format(msgprefix,subject)
-                resp = requests.post(
-                    gotifyurl,
-                    headers=headers,
-                    data={
-                        'title': title,
-                        'message': {content},
-                        'priority': 5})
-                if (resp.status_code != 200):
-                    print(f"Gotify message was not successfully sent: {resp}")
+                if (pushprovider.lower() == 'gotify'):
+                    headers = {'X-Gotify-Key': gotifytoken}
+                    resp = requests.post(
+                        gotifyurl,
+                        headers=headers,
+                        data={
+                            'title': title,
+                            'message': {content},
+                            'priority': 5})
+                    if (resp.status_code != 200):
+                        print(f"Gotify message was not successfully sent: {resp}")
+                    else:
+                        print("Gotify message is sent for the mail successfully.")
+                elif (pushprovider.lower() == 'serverchan'):
+                    resp = requests.post(serverchanurl + '?title=' + title + '&desp=' + content)
+                    if (resp.status_code != 200):
+                        print(f"ServerChan message was not successfully sent: {resp}")
+                    else:
+                        print("ServerChan message is sent for the mail successfully.")
                 else:
-                    print("Gotify message is sent for the mail successfully.")
+                    print("Unknown push service provider.")
                 # mark mail as Read so it won't be pushed to Gotify again
                 imap.store(i, '+FLAGS', '\Seen')
         except Exception as e:

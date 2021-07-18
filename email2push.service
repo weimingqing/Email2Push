@@ -1,0 +1,14 @@
+[Unit]
+Description=Send Push Notifications on incoming email.
+
+[Service]
+ExecStart=/usr/bin/python3 /home/ubuntu/apps/email2push/main.py
+WorkingDirectory=/home/ubuntu/apps/email2push
+Restart=always
+RestartSec=3
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=email2push.service
+
+[Install]
+WantedBy=default.target

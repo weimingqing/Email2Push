@@ -3,7 +3,11 @@ url = "domain name (fqdn) of the mail server"
 user = "username for email login"
 password = "password for email login"
 folder = "Inbox"
-gotifyurl = "url to the gotify server (append /message at the end)"
-token = "token for the gotify app"
 msgprefix = ""
 infiniteloop = True
+
+# Push service config
+pushprovider = "ServerChan"
+serverchanurl = "https://sctapi.ftqq.com/<token>.send"
+gotifyurl = "url to the gotify server (append /message at the end)"
+gotifytoken = "token for the gotify app"
