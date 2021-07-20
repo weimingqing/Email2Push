@@ -1,6 +1,22 @@
 #!/usr/bin/python3
 from settings import *
 import email
+import re
+from urllib import parse
+
+def clean_html(html):
+    # First we remove inline JavaScript/CSS:
+    cleaned = re.sub(r"(?is)<(script|style).*?>.*?(</\1>)", "", html.strip())
+    # Then we remove html comments. This has to be done before removing regular
+    # tags since comments can contain '>' characters.
+    cleaned = re.sub(r"(?s)<!--(.*?)-->[\n]?", "", cleaned)
+    # Next we can remove the remaining tags:
+    cleaned = re.sub(r"(?s)<.*?>", " ", cleaned)
+    # Finally, we deal with whitespace
+    cleaned = re.sub(r"&nbsp;", " ", cleaned)
+    cleaned = re.sub(r"  ", " ", cleaned)
+    cleaned = re.sub(r"  ", " ", cleaned)
+    return cleaned.strip()
 
 while True:
     imap = IMAP4_SSL(host=url, ssl_context=context)
@@ -34,7 +50,7 @@ while True:
                 receivers = email.utils.parseaddr(message['To'])[1]
                 header, encoding = email.header.decode_header(subject)[0]
                 if encoding:
-                    subject = header.decode(encoding)                
+                    subject = header.decode(encoding)
                 if message['CC']:
                     carboncopy = [email.utils.parseaddr(i)[1] for i in message['CC'].split(',')]
                 else:
@@ -63,7 +79,7 @@ while True:
                         if part.get_content_subtype() == 'plain':
                             content = part.get_payload(decode=True).decode(part.get_content_charset())
                         elif part.get_content_subtype() == 'html':
-                            content = part.get_payload(decode=True).decode(part.get_content_charset())
+                            content = clean_html(part.get_payload(decode=True).decode(part.get_content_charset()))
                         else:
                             content = "unknown content type"
 
@@ -83,7 +99,7 @@ while True:
                     else:
                         print("Gotify message is sent for the mail successfully.")
                 elif (pushprovider.lower() == 'serverchan'):
-                    resp = requests.post(serverchanurl + '?title=' + title + '&desp=' + content)
+                    resp = requests.post(serverchanurl + '?title=' + parse.quote(title) + '&desp=' + parse.quote(content))
                     if (resp.status_code != 200):
                         print(f"ServerChan message was not successfully sent: {resp}")
                     else:
