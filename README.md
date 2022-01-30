@@ -4,3 +4,4 @@ The script will fetch the unread emails, pushes them to a push notification serv
 Current supported push notification service:
 - Gotify
 - ServerChan
+- Bark

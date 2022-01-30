@@ -2,6 +2,7 @@
 from settings import *
 import email
 import re
+import json
 from urllib import parse
 
 def clean_html(html):
@@ -104,6 +105,21 @@ while True:
                         print(f"ServerChan message was not successfully sent: {resp}")
                     else:
                         print("ServerChan message is sent for the mail successfully.")
+                elif (pushprovider.lower() == 'bark'):
+                    headers = {'Content-Type': 'application/json; charset=utf-8'}
+                    data = {
+                        "title": title,
+                        "body": content,
+                        "device_key": barktoken
+                    }
+                    resp = requests.post(
+                        barkurl,
+                        headers=headers,
+                        data=json.dumps(data))
+                    if (resp.status_code != 200):
+                        print(f"Bark message was not successfully sent: {resp}")
+                    else:
+                        print("Bark message is sent for the mail successfully.")
                 else:
                     print("Unknown push service provider.")
                 # mark mail as Read so it won't be pushed to Gotify again
